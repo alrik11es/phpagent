@@ -1,0 +1,25 @@
+{
+  "actions":[
+    {
+      "name": "example-hook",
+      "event": "startup",
+      "action": "example_library"
+    }
+  ],
+  "hooks":[
+    {
+      "name": "example-hook",
+      "type": "active",
+      "url": "http://myserver.com/hooks",
+      "event": "startup",
+      "_action": "example_library"
+    }
+  ],
+  "plugins":[
+    {
+      "name" : "example_library",
+      "description" : "",
+      "csv_root" : "https://github.com/alrik11es/agent.git"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "agent",
+  "description": "Agent for your server needs.",
+  "keywords": ["agent", "daemon"],
+  "license": "MIT",
+  "require": {
+    "symfony/console": "2.6.3"
+  },
+  "autoload": {
+    "psr-0": {
+      "": "src/"
+    }
+  }
+}
