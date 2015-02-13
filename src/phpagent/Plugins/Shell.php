@@ -1,22 +1,25 @@
 <?php
-namespace Process;
+namespace phpagent\Plugins;
 
+use Process\IPlugin;
 
-interface IPlugin {
-
-    const EVENT = 1;
-    const ACTION = 2;
+class Shell implements IPlugin {
 
     /**
      * Executes the plugin and returns a response if needed in object format. (stdClass or whatever)
      * @return object
      */
-    public function run($params);
+    public function run($params)
+    {
+        return shell_exec($params);
+    }
 
     /**
      * Returns a constant that specifies the type of plugin you're creating
      * @return int
      */
-    public function type();
-
+    public function type()
+    {
+        return IPlugin::ACTION;
+    }
 }

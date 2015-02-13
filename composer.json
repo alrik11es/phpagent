@@ -10,5 +10,12 @@
     "psr-0": {
       "": "src/"
     }
+  },
+  "bin": [
+    "bin/phpagent"
+  ],
+  "config": {
+    "bin-dir": "bin",
+    "vendor-dir": "vendor"
   }
 }

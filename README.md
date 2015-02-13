@@ -1,7 +1,20 @@
 ## PHP Agent
 A PHP agent designed to fulfill your needs on any remote server. It uses an API to contact outside server app.
 
-##Installation (Debian based)
+##Installation PHAR build
+
+When the releases start to come we will build phar files for you in order to ease the process of
+installing without the need of composer.
+
+    # apt-get install git php5 php5-curl
+    # curl -sS https://getcomposer.org/installer | php
+    # mv phpagent.phar /usr/local/bin/phpagent
+
+Once you're finished all this commands you can now execute:
+    $ phpagent
+    
+
+##Installation from scratch
 
 You're gonna need composer for this one. And PHP 5 installed.
 
@@ -13,7 +26,7 @@ You're gonna need composer for this one. And PHP 5 installed.
     
 Once you're finished all this commands you can now execute:
 
-    ./bin/agent
+    $ ./bin/agent
 
 ## Daemon
 This app has a daemon ready to go. There are two ways to use this daemon as a real daemon or as a cronjob

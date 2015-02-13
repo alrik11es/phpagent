@@ -1,0 +1,7 @@
+#!/usr/bin/env php
+<?php
+define('AGENT_PATH', realpath(dirname(__FILE__)));
+$a = get_included_files();
+define('EXEC_PATH', getcwd());
+
+include(AGENT_PATH.'/../agent.php');

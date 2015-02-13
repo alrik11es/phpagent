@@ -1,0 +1,6 @@
+{
+  "files": ["src", "vendor", "config"],
+  "main": "bin/agent",
+  "output": "phpagent.phar",
+  "stub": true
+}

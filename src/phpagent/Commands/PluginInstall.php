@@ -1,5 +1,5 @@
 <?php
-namespace Commands;
+namespace phpagent\Commands;
 
 
 class PluginInstall {

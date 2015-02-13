@@ -1,7 +1,7 @@
 {
   "actions":[
     {
-      "name": "example-hook",
+      "name": "example-action",
       "event": "startup",
       "action": "example_library"
     }
