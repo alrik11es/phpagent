@@ -1,7 +1,7 @@
 <?php
 namespace phpagent\Plugins;
 
-class Shell extends AbstractPlugin implements IPlugin {
+class Now extends AbstractPlugin implements IPlugin {
 
     /**
      * Executes the plugin and returns a response if needed in object format. (stdClass or whatever)
@@ -9,8 +9,7 @@ class Shell extends AbstractPlugin implements IPlugin {
      */
     public function run($params)
     {
-        $result = shell_exec($params);
-        return $result;
+        return true;
     }
 
     /**
@@ -19,6 +18,6 @@ class Shell extends AbstractPlugin implements IPlugin {
      */
     public function type()
     {
-        return IPlugin::ACTION;
+        return self::EVENT;
     }
 }

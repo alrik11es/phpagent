@@ -9,8 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractPlugin implements IPlugin {
 
     /** @var InputInterface */
-    protected $input;
+    public $input;
     /** @var OutputInterface */
-    protected $output;
+    public $output;
 
 }

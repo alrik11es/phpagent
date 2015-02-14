@@ -1,9 +1,10 @@
 {
   "actions":[
     {
-      "name": "example-action",
-      "event": "startup",
-      "action": "example_library"
+      "name": "Say hello",
+      "event": "now",
+      "action": "shell",
+      "params": "echo Hello"
     }
   ],
   "hooks":[
@@ -11,8 +12,9 @@
       "name": "example-hook",
       "type": "active",
       "url": "http://myserver.com/hooks",
-      "event": "startup",
-      "action": "example_library"
+      "event": "now",
+      "action": "shell",
+      "params": "echo up"
     }
   ],
   "plugins":[

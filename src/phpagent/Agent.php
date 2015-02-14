@@ -33,7 +33,7 @@ class Agent {
         $config_files = $this->loadJsonConfigFiles();
         $config = $this->getAgentConfig($config_files);
         $this->execPlugins($config->actions);
-        $this->execPlugins($config->hooks);
+        $this->execHooks($config->hooks);
     }
 
     /**
@@ -42,9 +42,27 @@ class Agent {
      */
     public function execPlugins(array $actions)
     {
+        $this->output->writeln('<info>Executing plugins</info>');
         foreach($actions as $action){
             if($this->execEvent($action)){
                 $this->execAction($action);
+            }
+        }
+    }
+
+    /**
+     * Executes plugins.
+     * @param array $actions
+     */
+    public function execHooks(array $actions)
+    {
+        $this->output->writeln('<info>Executing hooks</info>');
+        foreach($actions as $action){
+            if($this->execEvent($action)){
+                $result = $this->execAction($action);
+                if(property_exists($action, 'type') && $action->type == 'active'){
+                    $this->execHook($action);
+                }
             }
         }
     }
@@ -100,14 +118,16 @@ class Agent {
      */
     private function execAction($action)
     {
+        $result = false;
         $class = $this->loadPlugin($action->action);
         if ($class) {
-            $class->input = $this->input;
-            $class->output = $this->output;
-            $class->run($action->params);
-        } else {
-            $this->output->writeln('<error>Action plugin ' . $action->action . ' not found</error>');
+            $result = $class->run($action->params);
+            if(is_string($result)) {
+                $this->output->writeln(Cow::say($result));
+                //$this->output->writeln('<info>Action result</info> ' . $result);
+            }
         }
+        return $result;
     }
 
     /**
@@ -121,10 +141,16 @@ class Agent {
         $class = $this->loadPlugin($action->event);
         if ($class) {
             $result = $class->run($action->params);
-        } else {
-            $this->output->writeln('<error>Event plugin ' . $action->event . ' not found</error>');
+            $info = ($result ? "Passed" : "<error>Not passed</error>");
+            $this->output->writeln('<info>Event result</info> ' . $info);
         }
         return $result;
+    }
+
+
+    private function execHook($action)
+    {
+        $action->url;
     }
 
     /**
@@ -134,12 +160,34 @@ class Agent {
      */
     private function loadPlugin($plugin_name)
     {
+        $sanitized_name = $this->getSanitizedPluginName($plugin_name);
         $result = false;
-        $class_name = '\phpagent\Plugins\\' . $plugin_name;
+        $class_name = '\phpagent\Plugins\\' . $sanitized_name;
         if (class_exists($class_name)) {
-            /** @var IPlugin $class */
+            /** @var IPlugin $result */
             $result = new $class_name();
+            $type = ($result->type() == IPlugin::EVENT ? "Event" : "Action");
+
+            $message = '<info>'.$type.' plugin loaded</info>';
+            $message .= ' ... '.$sanitized_name;
+            $result->input = $this->input;
+            $result->output = $this->output;
+
+            $this->output->writeln($message);
+        } else {
+            $this->output->writeln('<error>' . $sanitized_name . ' plugin not found</error>');
         }
         return $result;
+    }
+
+    /**
+     * Returns the plugin sanitized name.
+     * @param $plugin_name
+     * @return string
+     */
+    private function getSanitizedPluginName($plugin_name)
+    {
+        $sanitized_name = ucfirst(strtolower($plugin_name));
+        return $sanitized_name;
     }
 }

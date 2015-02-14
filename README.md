@@ -45,9 +45,9 @@ In PHP agent the actions are when you want to execute some commands in the daemo
 ```json
 {
   "name": "example-copy-action",
-  "_event": "startup",
-  "_action": "shell",
-  "_params": "cp /usr/local/file.txt /usr/local/file2.txt"
+  "event": "startup",
+  "action": "shell",
+  "params": "cp /usr/local/file.txt /usr/local/file2.txt"
 }
 ```
 
@@ -59,10 +59,10 @@ A hook is a specialized type of action that sends the action result to a web-ser
 {
   "name": "example-copy-hook",
   "type": "active",
-  "url": "http://myserver.com/hooks",
-  "_event": "startup",
-  "_action": "shell",
-  "_params": "cp /usr/local/file.txt /usr/local/file2.txt"
+  "url": "http://myserver.com/api/hook",
+  "event": "startup",
+  "action": "shell",
+  "params": "cp /usr/local/file.txt /usr/local/file2.txt"
 }
 ```
         
