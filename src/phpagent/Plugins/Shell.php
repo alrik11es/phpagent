@@ -1,9 +1,7 @@
 <?php
 namespace phpagent\Plugins;
 
-use Process\IPlugin;
-
-class Shell implements IPlugin {
+class Shell extends AbstractPlugin implements IPlugin {
 
     /**
      * Executes the plugin and returns a response if needed in object format. (stdClass or whatever)

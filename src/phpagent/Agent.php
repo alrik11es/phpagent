@@ -1,6 +1,10 @@
 <?php
 namespace phpagent;
 
+use phpagent\Plugins\IPlugin;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * Class Agent
  * Load config if not load default
@@ -10,12 +14,39 @@ namespace phpagent;
 class Agent {
 
     public $extract_methods = array('plugins', 'actions', 'hooks');
+    /** @var InputInterface */
+    private $input;
+    /** @var OutputInterface */
+    private $output;
 
+    public function __construct(InputInterface $input, OutputInterface $output)
+    {
+        $this->input = $input;
+        $this->output = $output;
+    }
+
+    /**
+     * Execute the agent
+     */
     public function run()
     {
         $config_files = $this->loadJsonConfigFiles();
         $config = $this->getAgentConfig($config_files);
-        print_r($config);
+        $this->execPlugins($config->actions);
+        $this->execPlugins($config->hooks);
+    }
+
+    /**
+     * Executes plugins.
+     * @param array $actions
+     */
+    public function execPlugins(array $actions)
+    {
+        foreach($actions as $action){
+            if($this->execEvent($action)){
+                $this->execAction($action);
+            }
+        }
     }
 
     /**
@@ -61,5 +92,54 @@ class Agent {
             }
         }
         return $config_files;
+    }
+
+    /**
+     * Executes single plugin based on action object
+     * @param $action
+     */
+    private function execAction($action)
+    {
+        $class = $this->loadPlugin($action->action);
+        if ($class) {
+            $class->input = $this->input;
+            $class->output = $this->output;
+            $class->run($action->params);
+        } else {
+            $this->output->writeln('<error>Action plugin ' . $action->action . ' not found</error>');
+        }
+    }
+
+    /**
+     * Executes an event based on action object
+     * @param $action
+     * @return int|object
+     */
+    private function execEvent($action)
+    {
+        $result = 0;
+        $class = $this->loadPlugin($action->event);
+        if ($class) {
+            $result = $class->run($action->params);
+        } else {
+            $this->output->writeln('<error>Event plugin ' . $action->event . ' not found</error>');
+        }
+        return $result;
+    }
+
+    /**
+     * Loads a plugin based a on a name
+     * @param $action
+     * @return IPlugin
+     */
+    private function loadPlugin($plugin_name)
+    {
+        $result = false;
+        $class_name = '\phpagent\Plugins\\' . $plugin_name;
+        if (class_exists($class_name)) {
+            /** @var IPlugin $class */
+            $result = new $class_name();
+        }
+        return $result;
     }
 }

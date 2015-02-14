@@ -12,7 +12,7 @@
       "type": "active",
       "url": "http://myserver.com/hooks",
       "event": "startup",
-      "_action": "example_library"
+      "action": "example_library"
     }
   ],
   "plugins":[

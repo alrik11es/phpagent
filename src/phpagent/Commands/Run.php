@@ -21,7 +21,7 @@ class Run extends Command {
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $agent = new Agent();
+        $agent = new Agent($input, $output);
         $agent->run();
 
     }
