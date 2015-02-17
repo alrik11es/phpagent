@@ -2,6 +2,7 @@
 namespace phpagent;
 
 use phpagent\Plugins\IPlugin;
+use League\Cowsayphp\Cow;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -12,6 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  */
 class Agent {
+
+    const HOOK_ACTIVE = 1;
+    const HOOK_PASSIVE = 2;
 
     public $extract_methods = array('plugins', 'actions', 'hooks');
     /** @var InputInterface */
@@ -42,11 +46,15 @@ class Agent {
      */
     public function execPlugins(array $actions)
     {
-        $this->output->writeln('<info>Executing plugins</info>');
-        foreach($actions as $action){
-            if($this->execEvent($action)){
-                $this->execAction($action);
+        if(count($actions)>0) {
+            $this->output->writeln('<info>Executing plugins</info>');
+            foreach ($actions as $action) {
+                if ($this->execEvent($action)) {
+                    $this->execAction($action);
+                }
             }
+        } else {
+            $this->output->writeln('<error>No defined plugins</error>');
         }
     }
 
@@ -56,14 +64,20 @@ class Agent {
      */
     public function execHooks(array $actions)
     {
-        $this->output->writeln('<info>Executing hooks</info>');
-        foreach($actions as $action){
-            if($this->execEvent($action)){
-                $result = $this->execAction($action);
-                if(property_exists($action, 'type') && $action->type == 'active'){
-                    $this->execHook($action);
+        if(count($actions)>0) {
+            $this->output->writeln('<info>Executing hooks</info>');
+            foreach ($actions as $action) {
+                if ($this->execEvent($action)) {
+                    $result = $this->execAction($action);
+                    if (property_exists($action, 'type') && $action->type == 'active') {
+                        $this->execHook($action, self::HOOK_ACTIVE);
+                    } else {
+                        $this->execHook($action, self::HOOK_PASSIVE);
+                    }
                 }
             }
+        } else {
+            $this->output->writeln('<error>No defined hooks</error>');
         }
     }
 
@@ -150,6 +164,7 @@ class Agent {
 
     private function execHook($action)
     {
+
         $action->url;
     }
 

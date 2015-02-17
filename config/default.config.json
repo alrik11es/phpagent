@@ -1,4 +1,7 @@
 {
+  "envars":{
+    "EXAMPLE_VAR": "/my/directory/"
+  },
   "actions":[
     {
       "name": "Say hello",
