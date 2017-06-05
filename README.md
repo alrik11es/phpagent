@@ -1,77 +1,77 @@
 ## PHP Agent
-A PHP agent designed to fulfill your needs on any remote server. It uses an API to contact outside server app.
+A PHP agent designed to listen for hooks and trigger actions on the server. 
 
-##Installation PHAR build
+    This program is a concept and still under development.
+    Please do not use it for production environments.
 
-When the releases start to come we will build phar files for you in order to ease the process of
-installing without the need of composer.
+## Requirements
 
-    # apt-get install git php5 php5-curl
+* PHP 7.0+
+
+## Installation PHAR build
+
+When the releases start to come we will build phar files in order to ease the process of
+installing.
+
     # curl -sS https://getcomposer.org/installer | php
     # mv phpagent.phar /usr/local/bin/phpagent
 
-Once you're finished all this commands you can now execute:
-    $ phpagent
+Once you're finished you can now execute:
     
+    $ phpagent
 
-##Installation from scratch
+## Installation from scratch
 
-You're gonna need composer for this one. And PHP 5 installed.
+You're gonna need composer for this one.
 
-    # apt-get install git php5 php5-curl
     # curl -sS https://getcomposer.org/installer | php
     # mv composer.phar /usr/local/bin/composer
-    # git clone https://github.com/alrik11es/agent.git
+    # git clone https://github.com/alrik11es/phpagent
     # composer install
     
 Once you're finished all this commands you can now execute:
 
-    $ ./bin/agent
+    $ ./bin/phpagent
 
-## Daemon
-This app has a daemon ready to go. There are two ways to use this daemon as a real daemon or as a cronjob
-depending on your needs.
+### Daemon mode
+You can use programs like [supervisord](http://supervisord.org/), [pm2](http://pm2.keymetrics.io/) or [forever](https://github.com/foreverjs/forever) to let this program run in daemon mode.
 
 ## Events
-An event is a moment on the daemon life where you want to execute some action or hook
-
-- startup
-- first-time
-- now
+This are triggers fired from other applications. For example an event could be the reception of a hook.
 
 ## Actions
-In PHP agent the actions are when you want to execute some commands in the daemon mode usually when an event occurs. 
+When a event is fired. The action will be performed. You can have many actions as you want.
 
 ```json
 {
-  "name": "example-copy-action",
-  "event": "startup",
-  "action": "shell",
-  "params": "cp /usr/local/file.txt /usr/local/file2.txt"
+  "actions": [{
+    "name": "example-copy-action",
+    "event": "startup",
+    "action": "shell",
+    "params": "cp /usr/local/file.txt /usr/local/file2.txt"
+  }]
 }
 ```
 
 ## Hooks
-A hook is a specialized type of action that sends the action result to a web-service on a server and allows specifying
- whether the hook is passive or active the possibility that this server returns some kind of feedback to the agent.
+A hook is a specialized type of action that enables a React HTTP server to listen for specific requests. Like POST, GET or whatever. When the hook is fired then the action is performed.
 
 ```json
 {
-  "name": "example-copy-hook",
-  "type": "active",
-  "url": "http://myserver.com/api/hook",
-  "event": "startup",
-  "action": "shell",
-  "params": "cp /usr/local/file.txt /usr/local/file2.txt"
+  "hooks": [{
+      "name": "example-copy-hook",
+      "route": "/api/hook",
+      "action": "shell",
+      "params": "cp /usr/local/file.txt /usr/local/file2.txt"
+  }]
 }
 ```
         
 ## Plugins
-We have a lot of plugins and growing, each plugin could be an event or action.
+There will be plugins. Stay in touch.
 
 ### Creating your own plugins
-As this cannot be really useful unless you can deploy new plugins to work with your agents we have created a way you
- can create the plugins with the most simple way possible.
+As this cannot be really useful unless you can deploy new plugins to work with your agents we have created a way you can create the plugins with the most simple way possible.
 
 ## Contributing
 

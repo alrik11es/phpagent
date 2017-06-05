@@ -1,5 +1,5 @@
 <?php
-namespace phpagent\Plugins;
+namespace PhpAgent\Plugins;
 
 
 use Symfony\Component\Console\Input\InputInterface;

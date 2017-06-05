@@ -1,5 +1,5 @@
 <?php
-namespace phpagent\Commands;
+namespace PhpAgent\Commands;
 
 use Process\IProcess;
 use Process\Update;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Daemon extends Command {
+class ListPlugins extends Command {
 
     protected function configure()
     {

@@ -1,5 +1,5 @@
 <?php
-namespace phpagent\Plugins;
+namespace PhpAgent\Plugins;
 
 class Shell extends AbstractPlugin implements IPlugin {
 
@@ -9,7 +9,7 @@ class Shell extends AbstractPlugin implements IPlugin {
      */
     public function run($params)
     {
-        $result = trim(shell_exec($params));
+        $result = trim(shell_exec($params).' > /dev/null 2>/dev/null &');
         return $result;
     }
 

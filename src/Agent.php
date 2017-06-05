@@ -1,5 +1,5 @@
 <?php
-namespace phpagent;
+namespace PhpAgent;
 
 use phpagent\Plugins\IPlugin;
 use League\Cowsayphp\Cow;
@@ -164,7 +164,6 @@ class Agent {
 
     private function execHook($action)
     {
-
         $action->url;
     }
 

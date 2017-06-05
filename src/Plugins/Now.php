@@ -1,5 +1,5 @@
 <?php
-namespace phpagent\Plugins;
+namespace PhpAgent\Plugins;
 
 class Now extends AbstractPlugin implements IPlugin {
 

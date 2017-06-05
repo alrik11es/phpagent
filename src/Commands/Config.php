@@ -1,5 +1,5 @@
 <?php
-namespace phpagent\Commands;
+namespace PhpAgent\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

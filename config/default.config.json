@@ -1,4 +1,7 @@
 {
+  "config":{
+    "port": "1234"
+  },
   "envars":{
     "EXAMPLE_VAR": "/my/directory/"
   },
@@ -13,11 +16,10 @@
   "hooks":[
     {
       "name": "example-hook",
-      "type": "active",
-      "url": "http://myserver.com/hooks",
+      "url": "/hook",
       "event": "now",
       "action": "shell",
-      "params": "echo up"
+      "params": "echo 'Hook launched'"
     }
   ],
   "plugins":[

@@ -1,5 +1,5 @@
 <?php
-namespace phpagent\Commands;
+namespace PhpAgent\Commands;
 
 use phpagent\Agent;
 use Symfony\Component\Console\Command\Command;
@@ -14,17 +14,17 @@ class Run extends Command {
     {
         $this
             ->setName('run')
-            ->setDescription('Execute the agent once (You can add this to crontab)')
+            ->setDescription('Execute the agent (You can add this process to supervisord or pm2)')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
+
+
         $agent = new Agent($input, $output);
         $agent->run();
-
     }
-
 
 }
