@@ -1,8 +1,8 @@
-## PHP Agent
+# PHP Agent
 A PHP agent designed to listen for hooks and trigger actions on the server. 
 
     This program is a concept and still under development.
-    Please do not use it for production environments.
+    Please do not use it until first RC.
 
 ## Requirements
 
@@ -33,14 +33,24 @@ Once you're finished all this commands you can now execute:
 
     $ ./bin/phpagent
 
+## Configuration
 ### Daemon mode
 You can use programs like [supervisord](http://supervisord.org/), [pm2](http://pm2.keymetrics.io/) or [forever](https://github.com/foreverjs/forever) to let this program run in daemon mode.
 
-## Events
-This are triggers fired from other applications. For example an event could be the reception of a hook.
+### Configuration files
+You can setup as many config files as you like. Supported config languages are JSON and YAML.
+There is an execution order based on directory location.
 
-## Actions
-When a event is fired. The action will be performed. You can have many actions as you want.
+* Default plugin config.
+* `/etc/phpagent` config.
+
+Be advise that if a config file writes a value of the config. Others can substitute but if empty value found there will be skipped 
+## Operations
+### Events
+This are triggers fired from other applications. For example an event could be the execution of a hook.
+
+### Actions
+When an event is fired. The action will be performed. You can have many actions as you want.
 
 ```json
 {
@@ -53,7 +63,7 @@ When a event is fired. The action will be performed. You can have many actions a
 }
 ```
 
-## Hooks
+### Hooks
 A hook is a specialized type of action that enables a React HTTP server to listen for specific requests. Like POST, GET or whatever. When the hook is fired then the action is performed.
 
 ```json
@@ -66,11 +76,11 @@ A hook is a specialized type of action that enables a React HTTP server to liste
   }]
 }
 ```
-        
-## Plugins
+
+### Plugins
 There will be plugins. Stay in touch.
 
-### Creating your own plugins
+#### Creating your own plugins
 As this cannot be really useful unless you can deploy new plugins to work with your agents we have created a way you can create the plugins with the most simple way possible.
 
 ## Contributing

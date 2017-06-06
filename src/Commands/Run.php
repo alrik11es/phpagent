@@ -1,7 +1,7 @@
 <?php
 namespace PhpAgent\Commands;
 
-use phpagent\Agent;
+use PhpAgent\Agent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,9 +20,6 @@ class Run extends Command {
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
-
-
         $agent = new Agent($input, $output);
         $agent->run();
     }

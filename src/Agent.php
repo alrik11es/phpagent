@@ -1,10 +1,13 @@
 <?php
 namespace PhpAgent;
 
+use Cowsayphp\Cow;
+use Dflydev\DotAccessData\Data;
 use phpagent\Plugins\IPlugin;
-use League\Cowsayphp\Cow;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class Agent
@@ -14,19 +17,19 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Agent {
 
-    const HOOK_ACTIVE = 1;
-    const HOOK_PASSIVE = 2;
-
-    public $extract_methods = array('plugins', 'actions', 'hooks');
     /** @var InputInterface */
     private $input;
     /** @var OutputInterface */
     private $output;
 
+    private $config = null;
+
     public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
+
+        $this->config = new \stdClass();
     }
 
     /**
@@ -34,10 +37,60 @@ class Agent {
      */
     public function run()
     {
-        $config_files = $this->loadJsonConfigFiles();
-        $config = $this->getAgentConfig($config_files);
-        $this->execPlugins($config->actions);
-        $this->execHooks($config->hooks);
+        $this->output->writeln('<bg=green;options=bold>Starting PHPAgent...</>');
+//        $config_files = $this->loadJsonConfigFiles();
+//        $config = $this->getAgentConfig($config_files);
+//        $this->execPlugins($config->actions);
+//        $this->execHooks($config->hooks);
+
+        $this->loadConfig();
+        if($this->output->isVerbose()) {
+            $this->output->writeln('Config is now loaded');
+        }
+
+        $this->output->writeln('Starting reactor listener ... <bg=blue;options=bold>Idle</>');
+    }
+
+    private function loadConfig()
+    {
+        // load config from directories
+        $finder = new Finder();
+        $files = $finder->ignoreUnreadableDirs()->in([AGENT_PATH.'/../config', '/etc/phpagent'])->files()->name('/\.json$|\.yaml$/');
+
+        if($this->output->isVerbose()) {
+            $this->output->writeln('<info>Remember that the file priority is /etc/phpagent and then [...]/phpagent_install/config</info>');
+            $this->output->writeln('<info>Detected ' . count($files) . ' config files</info>');
+        }
+
+        foreach($files as $file){
+            $content = $file->getContents();
+            if($this->isJson($content)){
+                $config = json_decode($content, true);
+                $this->parseConfig($config);
+                if($this->output->isVerbose()) {
+                    $this->output->writeln('Parsing ' . $file->getRelativePathname() . ' as JSON');
+                }
+            }
+
+            try{
+                $config = Yaml::parse($content);
+                $this->parseConfig($config);
+                if($this->output->isVerbose()) {
+                    $this->output->writeln('Parsing ' . $file->getRelativePathname() . ' as YAML');
+                }
+            } catch (\Exception $e){
+
+            }
+        }
+
+    }
+
+    private function parseConfig($config)
+    {
+        $dnp = \Alr\ObjectDotNotation\Data::load($config);
+        if(!empty($dnp->get('config.port'))) $this->config->port = $dnp->get('config.port');
+        if(!empty($dnp->get('actions'))) $this->config->actions = $dnp->get('actions');
+
     }
 
     /**
@@ -82,92 +135,6 @@ class Agent {
     }
 
     /**
-     * Obtain specified config and merge all files config with each other's
-     * @param array $config_files
-     * @return \stdClass
-     */
-    public function getAgentConfig(array $config_files)
-    {
-        $config = new \stdClass();
-        foreach($this->extract_methods as $method){
-            $config->$method = array();
-        }
-        foreach($config_files as $file){
-            $json = json_decode(file_get_contents($file));
-            if($json !== false){
-                foreach($this->extract_methods as $method){
-                    if(property_exists($json, $method) && is_array($json->$method)){
-                        $config->$method = array_merge($config->$method, $json->$method);
-                    }
-                }
-            }
-        }
-        return $config;
-    }
-
-    /**
-     * Obtain the json files from the script working directory
-     * @return array The array of config files with full path each
-     */
-    public function loadJsonConfigFiles()
-    {
-        $config_files = array();
-        $dir = scandir(EXEC_PATH);
-        if(count($dir) > 2) {
-            array_shift($dir);
-            array_shift($dir);
-            foreach ($dir as $file) {
-                $ext = pathinfo($file, PATHINFO_EXTENSION);
-                if ($ext == 'json') {
-                    $config_files[] = EXEC_PATH . '/' . $file;
-                }
-            }
-        }
-        return $config_files;
-    }
-
-    /**
-     * Executes single plugin based on action object
-     * @param $action
-     */
-    private function execAction($action)
-    {
-        $result = false;
-        $class = $this->loadPlugin($action->action);
-        if ($class) {
-            $result = $class->run($action->params);
-            if(is_string($result)) {
-                $this->output->writeln(Cow::say($result));
-                //$this->output->writeln('<info>Action result</info> ' . $result);
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Executes an event based on action object
-     * @param $action
-     * @return int|object
-     */
-    private function execEvent($action)
-    {
-        $result = 0;
-        $class = $this->loadPlugin($action->event);
-        if ($class) {
-            $result = $class->run($action->params);
-            $info = ($result ? "Passed" : "<error>Not passed</error>");
-            $this->output->writeln('<info>Event result</info> ' . $info);
-        }
-        return $result;
-    }
-
-
-    private function execHook($action)
-    {
-        $action->url;
-    }
-
-    /**
      * Loads a plugin based a on a name
      * @param $action
      * @return IPlugin
@@ -204,4 +171,10 @@ class Agent {
         $sanitized_name = ucfirst(strtolower($plugin_name));
         return $sanitized_name;
     }
+
+    public function isJson($string) {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+
 }
