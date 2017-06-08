@@ -29,7 +29,7 @@ class Agent {
         $this->input = $input;
         $this->output = $output;
 
-        $this->config = new \stdClass();
+        $this->config = new Config();
     }
 
     /**
@@ -49,6 +49,10 @@ class Agent {
         }
 
         $this->output->writeln('Starting reactor listener ... <bg=blue;options=bold>Idle</>');
+
+        $hookListener = new HookListener($this->config, $this->output, $this->input);
+        $hookListener->startup();
+
     }
 
     private function loadConfig()
@@ -93,46 +97,6 @@ class Agent {
 
     }
 
-    /**
-     * Executes plugins.
-     * @param array $actions
-     */
-    public function execPlugins(array $actions)
-    {
-        if(count($actions)>0) {
-            $this->output->writeln('<info>Executing plugins</info>');
-            foreach ($actions as $action) {
-                if ($this->execEvent($action)) {
-                    $this->execAction($action);
-                }
-            }
-        } else {
-            $this->output->writeln('<error>No defined plugins</error>');
-        }
-    }
-
-    /**
-     * Executes plugins.
-     * @param array $actions
-     */
-    public function execHooks(array $actions)
-    {
-        if(count($actions)>0) {
-            $this->output->writeln('<info>Executing hooks</info>');
-            foreach ($actions as $action) {
-                if ($this->execEvent($action)) {
-                    $result = $this->execAction($action);
-                    if (property_exists($action, 'type') && $action->type == 'active') {
-                        $this->execHook($action, self::HOOK_ACTIVE);
-                    } else {
-                        $this->execHook($action, self::HOOK_PASSIVE);
-                    }
-                }
-            }
-        } else {
-            $this->output->writeln('<error>No defined hooks</error>');
-        }
-    }
 
     /**
      * Loads a plugin based a on a name
