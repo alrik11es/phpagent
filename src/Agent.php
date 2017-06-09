@@ -2,7 +2,6 @@
 namespace PhpAgent;
 
 use Cowsayphp\Cow;
-use Dflydev\DotAccessData\Data;
 use phpagent\Plugins\IPlugin;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,11 +36,7 @@ class Agent {
      */
     public function run()
     {
-        $this->output->writeln('<bg=green;options=bold>Starting PHPAgent...</>');
-//        $config_files = $this->loadJsonConfigFiles();
-//        $config = $this->getAgentConfig($config_files);
-//        $this->execPlugins($config->actions);
-//        $this->execHooks($config->hooks);
+        $this->output->writeln('<bg=green;options=bold>Starting PHPAgent ...</>');
 
         $this->loadConfig();
         if($this->output->isVerbose()) {
@@ -52,7 +47,6 @@ class Agent {
 
         $hookListener = new HookListener($this->config, $this->output, $this->input);
         $hookListener->startup();
-
     }
 
     private function loadConfig()
@@ -94,46 +88,9 @@ class Agent {
         $dnp = \Alr\ObjectDotNotation\Data::load($config);
         if(!empty($dnp->get('config.port'))) $this->config->port = $dnp->get('config.port');
         if(!empty($dnp->get('actions'))) $this->config->actions = $dnp->get('actions');
+        if(!empty($dnp->get('hooks'))) $this->config->hooks = $dnp->get('hooks');
+        if(!empty($dnp->get('plugins'))) $this->config->plugins = $dnp->get('plugins');
 
-    }
-
-
-    /**
-     * Loads a plugin based a on a name
-     * @param $action
-     * @return IPlugin
-     */
-    private function loadPlugin($plugin_name)
-    {
-        $sanitized_name = $this->getSanitizedPluginName($plugin_name);
-        $result = false;
-        $class_name = '\phpagent\Plugins\\' . $sanitized_name;
-        if (class_exists($class_name)) {
-            /** @var IPlugin $result */
-            $result = new $class_name();
-            $type = ($result->type() == IPlugin::EVENT ? "Event" : "Action");
-
-            $message = '<info>'.$type.' plugin loaded</info>';
-            $message .= ' ... '.$sanitized_name;
-            $result->input = $this->input;
-            $result->output = $this->output;
-
-            $this->output->writeln($message);
-        } else {
-            $this->output->writeln('<error>' . $sanitized_name . ' plugin not found</error>');
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the plugin sanitized name.
-     * @param $plugin_name
-     * @return string
-     */
-    private function getSanitizedPluginName($plugin_name)
-    {
-        $sanitized_name = ucfirst(strtolower($plugin_name));
-        return $sanitized_name;
     }
 
     public function isJson($string) {

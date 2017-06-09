@@ -2,31 +2,12 @@
   "config":{
     "port": "1234"
   },
-  "envars":{
-    "EXAMPLE_VAR": "/my/directory/"
-  },
-  "actions":[
-    {
-      "name": "Say hello",
-      "event": "now",
-      "action": "shell",
-      "params": "echo Hello"
-    }
-  ],
   "hooks":[
     {
       "name": "example-hook",
       "url": "/hook",
-      "event": "now",
       "action": "shell",
       "params": "echo 'Hook launched'"
-    }
-  ],
-  "plugins":[
-    {
-      "name" : "example_library",
-      "description" : "",
-      "csv_root" : "https://github.com/alrik11es/agent.git"
     }
   ]
 }

@@ -4,6 +4,8 @@ A PHP agent designed to listen for hooks and trigger actions on the server.
     This program is a concept and still under development.
     Please do not use it until first RC.
 
+[![asciicast](https://asciinema.org/a/9n3qy9nwtefcz3u768on6cr9o.png)](https://asciinema.org/a/9n3qy9nwtefcz3u768on6cr9o)
+
 ## Requirements
 
 * PHP 7.0+
@@ -46,22 +48,6 @@ There is an execution order based on directory location.
 
 Be advise that if a config file writes a value of the config. Others can substitute but if empty value found there will be skipped 
 ## Operations
-### Events
-This are triggers fired from other applications. For example an event could be the execution of a hook.
-
-### Actions
-When an event is fired. The action will be performed. You can have many actions as you want.
-
-```json
-{
-  "actions": [{
-    "name": "example-copy-action",
-    "event": "startup",
-    "action": "shell",
-    "params": "cp /usr/local/file.txt /usr/local/file2.txt"
-  }]
-}
-```
 
 ### Hooks
 A hook is a specialized type of action that enables a React HTTP server to listen for specific requests. Like POST, GET or whatever. When the hook is fired then the action is performed.
@@ -76,12 +62,6 @@ A hook is a specialized type of action that enables a React HTTP server to liste
   }]
 }
 ```
-
-### Plugins
-There will be plugins. Stay in touch.
-
-#### Creating your own plugins
-As this cannot be really useful unless you can deploy new plugins to work with your agents we have created a way you can create the plugins with the most simple way possible.
 
 ## Contributing
 

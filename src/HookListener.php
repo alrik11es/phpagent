@@ -1,10 +1,18 @@
 <?php
 namespace PhpAgent;
 
+use PhpAgent\Plugins\IPlugin;
+use React\Http\Response;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 class HookListener
 {
+
     private $config;
+    /** @var OutputInterface */
     private $output;
+    /** @var InputInterface */
     private $input;
 
     /**
@@ -21,65 +29,42 @@ class HookListener
     }
 
 
-    public function startup(){
-
-        $app = function ($request, $response) {
-            $response->writeHead(200, array('Content-Type' => 'text/plain'));
-            $response->end("Hook launched\n");
-        };
-
+    public function startup()
+    {
         $loop = \React\EventLoop\Factory::create();
         $socket = new \React\Socket\Server($loop);
         $http = new \React\Http\Server($socket, $loop);
 
-        $http->on('request', $app);
-//        echo "Server running at http://127.0.0.1:1337\n";
+        $http->on('request', function (\React\Http\Request $request, Response $response) use($loop) {
+
+            $response->writeHead(200, array('Content-Type' => 'text/plain'));
+            $hook_executed = false;
+            foreach($this->config->hooks as $hook){
+                if($request->getPath() == $hook->url){
+                    $hook_executed = true;
+                    $this->output->writeln('Executing hook ... <info>'.$hook->name.'</info>');
+
+                    $process = new \React\ChildProcess\Process($hook->params);
+                    $process->start($loop);
+
+                    $process->stdout->on('data', function ($chunk) {
+                        echo $chunk;
+                    });
+
+                    $process->stdout->on('end', function () use ($response) {
+                        $response->end("Hook launched\n");
+                    });
+
+                }
+            }
+
+            if(!$hook_executed){
+                $response->end("No hook\n");
+            }
+        });
 
         $socket->listen($this->config->port);
         $loop->run();
 
     }
-
-    /**
-     * Executes plugins.
-     * @param array $actions
-     */
-    public function execPlugins(array $actions)
-    {
-        if(count($actions)>0) {
-            $this->output->writeln('<info>Executing plugins</info>');
-            foreach ($actions as $action) {
-                if ($this->execEvent($action)) {
-                    $this->execAction($action);
-                }
-            }
-        } else {
-            $this->output->writeln('<error>No defined plugins</error>');
-        }
-    }
-
-    /**
-     * Executes plugins.
-     * @param array $actions
-     */
-    public function execHooks(array $actions)
-    {
-        if(count($actions)>0) {
-            $this->output->writeln('<info>Executing hooks</info>');
-            foreach ($actions as $action) {
-                if ($this->execEvent($action)) {
-                    $result = $this->execAction($action);
-                    if (property_exists($action, 'type') && $action->type == 'active') {
-                        $this->execHook($action, self::HOOK_ACTIVE);
-                    } else {
-                        $this->execHook($action, self::HOOK_PASSIVE);
-                    }
-                }
-            }
-        } else {
-            $this->output->writeln('<error>No defined hooks</error>');
-        }
-    }
-
-
 }

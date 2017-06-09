@@ -9,7 +9,7 @@ class Shell extends AbstractPlugin implements IPlugin {
      */
     public function run($params)
     {
-        $result = trim(shell_exec($params).' > /dev/null 2>/dev/null &');
+        $result = trim(shell_exec($params));
         return $result;
     }
 
