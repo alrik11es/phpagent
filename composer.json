@@ -10,7 +10,7 @@
     "react/react": "^0.4.2",
     "symfony/finder": "^3.3",
     "symfony/yaml": "^3.3",
-    "alrik11es/object-dot-notation": "^1.0",
+    "alrik11es/object-dot-notation": "^1.0"
   },
   "autoload": {
     "psr-4": {
